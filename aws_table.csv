@@ -1,0 +1,5 @@
+Type;Protocol;Port Range;Source;Info
+SSH;TCP;22;Anywhere: 0.0.0.0/0, ::0;Remote login
+HTTP;TCP;80;Anywhere: 0.0.0.0/0, ::0;Use nginx to password protect and reroute
+Custom TCPI ;TCP;3838;Anywhere: 0.0.0.0/0, ::0;Default R Shiny port
+Custom TCPI ;TCP;8787;Anywhere: 0.0.0.0/0, ::0;Default R Studio port
