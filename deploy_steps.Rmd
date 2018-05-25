@@ -75,8 +75,8 @@ kable(text_tbl) %>%
 <!-- - Security Group: http-ssh-anywhere - This part of the configuration tells your instance who is allowed to talk to and access it. These are the rules I use so that I can connect remotely (ssh), and http ports to display web data. Using the configurations recommended by [mgritts](http://mgritts.github.io/2016/07/08/shiny-aws/), here are the 4 security rules:  -->
 ```{r, echo=FALSE, warning= FALSE, message=FALSE}
 library(readr)
-aws_table <- read_delim("aws_table.csv", delim = ";")
-View(aws_table)
+aws_table <- read_delim("table_data/aws_table.csv", delim = ";")
+#View(aws_table)
 
 kable(aws_table) %>%
   kable_styling("striped", full_width = F) %>%
