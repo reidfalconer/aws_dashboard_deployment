@@ -35,9 +35,13 @@ library(kableExtra)
 
 # Step 1: Setup an AWS Account
 
-[Amazon](aws.amazon.com/) provides one year’s worth of access to their Free Tier for AWS. However, there are a vast number of options available, and they are worth checking out. The important one is that they provide a free 750 hours/month to deploy an EC2 instance. That’s just enough to keep 1 EC2 instance active 24/7.
+[Amazon](aws.amazon.com/) provides one year’s worth of access to their Free Tier for AWS. However, there are a vast number of options available, and they are worth checking out. 
 
-If you aren’t familiar with EC2, think of it as your always-on personal Linux computer that you can connect to through SSH, and access through the web using an IP address. One step further and you can access it through a custom domain name.
+If you aren’t familiar with EC2 (Amazon’s Elastic Compute Cloud), think of it as your always-on personal Linux computer that you can connect to through SSH, and access through the web using an IP address for running applications on AWS infrastructure.
+
+You need to sign up if you haven’t registered yet with AWS, so head on over to https://aws.amazon.com to get started.
+
+Once on the home page you can select the top right to sign in to the console. This will allow you to sign in or set up an account if you do not have one.
 
 # Step 2: Launch EC2 instance following this AWS [10-Minute Tutorial](https://aws.amazon.com/getting-started/launch-a-virtual-machine-B-0/launch-a-virtual-machine-B-1/).
 ```{r, echo=FALSE, out.width = '80%'}
@@ -115,7 +119,7 @@ Next, you’ll connect to your instance by typing (copy and paste it exactly as 
 ```{r, eval= F}
 $ ssh -i "file.pem" ubuntu@ec2-IPADDRESS.compute-1.amazonaws.com
 ```
-When you connect for the first time, it might give you a prompt asking: "Are you sure you want to continue connecting?” Type yes. Hopefully, you’ll see something like this:
+When you connect for the first time, it might give you a prompt asking: "Are you sure you want to continue connecting?” Type `yes`. Hopefully, you’ll see something like this:
 
 ```{r, eval=FALSE}
 Welcome to Ubuntu 14.04.5 LTS (GNU/Linux 3.13.0-149-generic x86_64)
@@ -383,7 +387,7 @@ Resulting in:
 knitr::include_graphics("images/nano2.png")
 ```
 
-To exit-out on of nano, use `Ctrl+x` and type `Y` to save. You can then press enter to return to the terminal. (See [Useful Nano Keyboard Commands](https://staffwww.fullcoll.edu/sedwards/Nano/UsefulNanoKeyCommands.html))
+To exit-out on of nano, use `Ctrl+x` and type `Y` to save. You can then press `ENTER` to return to the terminal. (See [Useful Nano Keyboard Commands](https://staffwww.fullcoll.edu/sedwards/Nano/UsefulNanoKeyCommands.html))
 
 ### R Shiny config changes: 
 You  must now do a similar process to the shiny-server config file at `/etc/shiny-server/shiny-server.conf`
@@ -419,7 +423,7 @@ server {
 ```{r, echo=FALSE, out.width = '90%'}
 knitr::include_graphics("images/nano3.png")
 ```
-Use `Ctrl+x` to exit and type `Y` to save. Press enter to return to the command line.
+Use `Ctrl+x` to exit and type `Y` to save. Press `ENTER` to return to the command line.
 
 `nano` does take some time getting used to but now you have set up the groundwork required to create users and passwords on your Shiny Server. The IP address `127.0.0.1` is a special-purpose IPv4 address called localhost or loopback address. All computers use this address as their own, but it doesn't let them communicate with other devices like a real IP address does. See [www.lifewire.com](https://www.lifewire.com/network-computer-special-ip-address-818385) for more information. 
 
@@ -485,9 +489,9 @@ You can add an R Studio user with:
 $ sudo adduser exampleuser 
 ```
 
-This will prompt you to `Enter new UNIX password:`. This is where you define your R Studio Password. Furthermore, you will be asked to provide user information for user `exampleuser`. However, you can just press ENTER for the default. And press [Y] to confirm that the information correct.
+This will prompt you to `Enter new UNIX password:`. This is where you define your R Studio Password. Furthermore, you will be asked to provide user information for user `exampleuser`. However, you can just press `ENTER` for the default. And press `Y` to confirm that the information correct.
 
-Once this is done, you can now access your RStudio GUI using your user information. Go to `http://<public-ip>:8787` and log in. You should be then be greeted by the friendly RStudio GUI. 
+Once this is done, you can now access your RStudio GUI using your user information. Go to `http://<public-ip>:8787` and log in. You should then be greeted by the friendly RStudio GUI. 
 ```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/rstudio2.png")
 ```
@@ -512,12 +516,12 @@ Furthermore, if you want to remove a user, you can use:
 # remove RStudio user 
 $ sudo userdel exampleuser 
 ```
-However, if you get the note "userdel: user exampleuser is currently used by process 8334 (<pid>)", then you have first to kill the process using: 
+However, if you get the note "userdel: user exampleuser is currently used by process <pid>", then you have to first kill the process using: 
 ```{r, eval=F}
 # kill RStudio user session
 $ sudo rstudio-server kill-session <pid>
 ```
-And then you will be able to remove the user exampleuser using `$ sudo userdel`
+Then you will be able to remove the user exampleuser using `$ sudo userdel`
 
 Please see the [RStudio Server Professional Edition Administration Guide](http://docs.rstudio.com/ide/server-pro/index.html) and the [Shiny Server Professional Administrator's Guide](http://docs.rstudio.com/shiny-server/) for more detailed information and alternative commands.  
 
@@ -531,7 +535,7 @@ $ sudo rm /srv/shiny-server/index.html
 $ sudo rm -rf /srv/shiny-server/sample-apps
 ```
 
-Once this is done, all further work can be executed in the R Studio UI `http://<public-ip>:8787`.
+Once this is done, all further work can be executed in the R Studio GUI `http://<public-ip>:8787`.
 
 The first thing you should do is to configure your git `user.name` and `user.email` within the R Studio terminal. By entering the following:
 ```{r, eval = F}
