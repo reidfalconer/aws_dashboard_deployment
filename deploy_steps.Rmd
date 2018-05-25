@@ -1,5 +1,5 @@
 ---
-title: "How to deploy a R Shiny App/Flexdashboard using AWS" 
+title: "How to deploy a Dashboard using RStudio and AWS" 
 #subtitle: "A report prepared for Predictive Insights"
 #author: "Reid Falconer"
 #date: "5/23/2018"
@@ -13,6 +13,8 @@ output:
     toc_depth: 2
     toc_float: 
       collapsed: false
+urlcolor: blue
+    
 ---
 <!-- <div id="logo-container"> -->
 <!-- <img src="images/logo.svg" class="logo"/> -->
@@ -25,6 +27,11 @@ library(tidyverse)
 library(knitr)
 library(kableExtra)
 ```
+<style>
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    background-color: #0083a8;
+}
+</style>
 
 # Step 1: Setup an AWS Account
 
@@ -33,12 +40,16 @@ library(kableExtra)
 If you aren’t familiar with EC2, think of it as your always-on personal Linux computer that you can connect to through SSH, and access through the web using an IP address. One step further and you can access it through a custom domain name.
 
 # Step 2: Launch EC2 instance following this AWS [10-Minute Tutorial](https://aws.amazon.com/getting-started/launch-a-virtual-machine-B-0/launch-a-virtual-machine-B-1/).
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/aws.png")
+```
 
 ### Configuration Settings
+
 The configuration setting I used are as follows:
 ```{r, echo=FALSE, warning= FALSE, message=FALSE}
 text_tbl <- data.frame(
-  Option = c("__AMI__", "__Instance Type__","__Configure Instance__","__Storage__", "__Tag__", "__Security Group__"),
+  Option = c("AMI", "Instance Type","Configure Instance","Storage", "Tag", "Security Group"),
   Choice = c(
     "Ubuntu Server 14.04 LTS (HVM), SSD Volume Type - This option is chosen since it is free tier eligible and it behaves well when setting up an RStudio and Shiny server.",
     "t2.micro - The free tier option. However, given that R works in memory, this choice is very restrictive (only 1 GiB memory). Thus, I recommend choosing an instance with more memory (i.e. the ones that are memory optimised) if you are going to be doing large amounts of computing.", 
@@ -50,7 +61,9 @@ text_tbl <- data.frame(
 )
 
 kable(text_tbl) %>%
-  kable_styling(full_width = F)
+  kable_styling("striped", full_width = F) %>%
+  column_spec(1, bold = T) %>% 
+  row_spec(0, bold = T, color = "white", background = "#0083a8")
 ```
 
 
@@ -68,7 +81,7 @@ View(aws_table)
 kable(aws_table) %>%
   kable_styling("striped", full_width = F) %>%
   column_spec(1, bold = T) %>% 
-  row_spec(0, bold = T, color = "white", background = "#66CABF")
+  row_spec(0, bold = T, color = "white", background = "#0083a8")
 ```
 
 In the final step, you can "Review Instance Launch". This tread will allow you to review your instance launch details. Once you've done that, click "Launch" to assign your instance a key pair.
@@ -82,13 +95,14 @@ Once downloaded and stored, you can "Launch" your instance by clicking `Launch I
 Once your instance is up and running, you can go ahead and connect to it by clicking on it and clicking "Connect".
 
 You should get the following pop-up:
-```{r, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/connect.png")
 ```
 
 Now it's time to fire up your command line - on a Mac, it's your Terminal (if you run on Windows, you’ll need to download [PuTTY](https://www.putty.org/).) - and change your directory (cd) to where your key (`.pem` file) was securly moved to (i.e out of your download folder).
 
 ```{r, eval= F}
+# set working directory 
 $ cd path_to_file/file.pem
 ```
 Back in Terminal, you'll want to enter:
@@ -127,6 +141,7 @@ Welcome to Ubuntu 14.04.5 LTS (GNU/Linux 3.13.0-149-generic x86_64)
 
 If you ever want to disconnect from your instance (when you've finished this tutorial), simply type `exit` into your terminal and you’ll be logged out and disconnected from your AWS instance.
 ```{r, eval= F}
+# disconnect from instance
 $ exit
 ```
 
@@ -135,6 +150,7 @@ $ exit
 You are now ready to install R and the required system libraries. But first, you need to update the Linux application library. 
 
 ```{r, eval=F}
+# update application library
 $ sudo apt-get update
 $ sudo apt-get -y install \
     nginx \
@@ -154,7 +170,7 @@ $ sudo apt-get -y install \
     git
 ```
 To confirm that things are working as they should be. Type your `http://<public-ip>`  into the URL bar of a browser you should get the following nginx welcome screen: 
-```{r pressure, echo=FALSE, out.width = '100%'}
+```{r pressure, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/nginx.png")
 ```
 Nginx will be used to improve the performance, reliability, and security of your the shiny dashboard/application.
@@ -171,6 +187,7 @@ $ sudo apt-get update
 ### R Server
 You can then install R using the following command:
 ```{r, eval=F}
+# install R
 $ sudo apt-get install r-base
 ```
 You may get a prompt saying "X MB of additional disk space will be used. Do you want to continue? [Y/n]" Type `Y`. 
@@ -186,6 +203,7 @@ You are now ready to install both the RStudio and R Shiny Servers using the synt
 
 ###  RStudio Server
 ```{r, eval=F}
+# Install RStudio Server
 $ sudo apt-get install gdebi-core
 $ wget https://download2.rstudio.org/rstudio-server-1.1.453-amd64.deb
 $ sudo gdebi rstudio-server-1.1.453-amd64.deb
@@ -198,6 +216,7 @@ $ sudo su - \
 -c "R -e \"install.packages('shiny', repos='https://cran.rstudio.com/')\""
 ```
 ```{r, eval=F}
+# Install Shiny Server
 $ sudo apt-get install gdebi-core
 $ wget https://download3.rstudio.org/ubuntu-14.04/x86_64/shiny-server-1.5.7.907-amd64.deb
 $ sudo gdebi shiny-server-1.5.7.907-amd64.deb
@@ -206,7 +225,7 @@ Type `y` for both "Do you want to install the software package?" questions.
 
 You can now check that both the servers were installed successfully using the `ls` bash command: 
 ```{r, eval=F}
-$ ls   # bash command ls = lists your files
+$ ls  # bash command ls = lists your files
 ```
 This input should return `rstudio-server-X-amd64.deb  shiny-server-X-amd64.deb`: The two .deb files, one for rstudio-server and one for shiny-server (and their respective versions). 
 
@@ -240,28 +259,43 @@ $ sudo su - -c "R -e \"install.packages('tidyverse', repos='http://cran.rstudio.
 $ sudo su - -c "R -e \"install.packages(c('leaflet', 'highcharter', 'DT'), repos='http://cran.rstudio.com/')\""
 ```
 
-If you get an error installing one of your packages. This problem is most likely a memory issue (especially if you are using the 1 GiB free tier option). One way around this is to look online for an Ubuntu repository of the precompiled R package. 
+### devtools
+If you want to install the development version of a package (ggplot2 in this example) from GitHub, you can use:
+```{r, eval=F}
+sudo su - -c "R -e \"install.packages('devtools', repos='http://cran.rstudio.com/')\""
+sudo su - -c "R -e \"devtools::install_github('tidyverse/ggplot2')\""
+```
 
-I got an error trying to install the `readr` package. Therefore I used the below code to access the Launchpad PPA. (Packages for the CRAN repository are built on a Launchpad PPA called RutteR). See [RutteR](https://launchpad.net/~marutter/+archive/ubuntu/rrutter) for more info.
+### Package Error
+If you get an error installing one of your packages. The problem is most likely a memory issue (especially if you are using the 1 GiB free tier option). One way around this is to look online for an Ubuntu repository of the precompiled R package. 
 
-```{eval=F}
+For example: I got an error trying to install the `readr` package (in the tidyverse). Therefore, I used the code below to access the Launchpad PPA. (Packages for the CRAN repository are built on a Launchpad PPA called RutteR). See [RutteR](https://launchpad.net/~marutter/+archive/ubuntu/rrutter) for more info.
+
+```{r, eval=F}
 $ sudo add-apt-repository -y "ppa:marutter/rrutter"
 $ sudo add-apt-repository -y "ppa:marutter/c2d4u"
 $ sudo apt update
 $ sudo apt install r-cran-readr
 ```
 
-You can now easily confirm that both your RStudio and R Shiny servers are running correctly: 
+To check how much memory you have used you can use the following shell command: 
+```{r, eval=F}
+# check instance memory
+$ free -m
+```
+Where `-m` shows output in megabytes and `-g` shows output in gigabytes.
+
+Furthermore, you can now easily confirm that both your RStudio and R Shiny servers are running correctly: 
 
 - The R Shiny Server is served on port `3838`. Thus, if you type your `http://<public-ip>:3838`  into the URL bar of a browser you should see a default index.html page with a shiny app and rmarkdown document.
 
-```{r, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/shiny2.png")
 ```
 
 - The RStudio Server is served on port `8787`. Therefore, typing `http://<public-ip>:8787` into the URL bar, you should get the following RStudio sign in page:
 
-```{r, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/rstudio.png")
 ```
 
@@ -273,6 +307,7 @@ First, you must stop both the nginx service and shiny-server. This process shoul
 
 - Back in terminal:
 ```{r, eval=F}
+# stop nginx service and shiny-server
 $ sudo service nginx stop
 $ sudo stop shiny-server
 ```
@@ -286,7 +321,11 @@ First, you are going to change the nginx config file located at `/etc/nginx/site
 $ sudo nano /etc/nginx/sites-available/default
 ```
 You should see something like this:
-```{r, eval=FALSE}
+```{r, echo=FALSE, out.width = '90%'}
+knitr::include_graphics("images/nano1.png")
+```
+
+```{r, eval=FALSE, include=FALSE}
  GNU nano 2.2.6                   File: /etc/nginx/sites-available/default                                             
 # You may add here your
 # server {
@@ -338,7 +377,13 @@ server {
 }
 ```
 
-To exit-out on of nano, use `Ctrl+x` and type `Y` to save. You can then press enter to return to the terminal. 
+Resulting in:
+
+```{r, echo=FALSE, out.width = '90%'}
+knitr::include_graphics("images/nano2.png")
+```
+
+To exit-out on of nano, use `Ctrl+x` and type `Y` to save. You can then press enter to return to the terminal. (See [Useful Nano Keyboard Commands](https://staffwww.fullcoll.edu/sedwards/Nano/UsefulNanoKeyCommands.html))
 
 ### R Shiny config changes: 
 You  must now do a similar process to the shiny-server config file at `/etc/shiny-server/shiny-server.conf`
@@ -371,7 +416,9 @@ server {
   }
 }
 ```
-
+```{r, echo=FALSE, out.width = '90%'}
+knitr::include_graphics("images/nano3.png")
+```
 Use `Ctrl+x` to exit and type `Y` to save. Press enter to return to the command line.
 
 `nano` does take some time getting used to but now you have set up the groundwork required to create users and passwords on your Shiny Server. The IP address `127.0.0.1` is a special-purpose IPv4 address called localhost or loopback address. All computers use this address as their own, but it doesn't let them communicate with other devices like a real IP address does. See [www.lifewire.com](https://www.lifewire.com/network-computer-special-ip-address-818385) for more information. 
@@ -394,16 +441,19 @@ $ sudo htpasswd -c /etc/nginx/.htpasswd exampleuser
 
 For example:
 ```{r, eval= F}
+# add shiny-server user
 $ sudo htpasswd /etc/nginx/.htpasswd additionaluser
 ```
 
 Now if you view the contents of your `.htpasswd` file, you should see the username and the encrypted password for the added users.
 ```{r, eval= F}
+# list shiny-server users
 $ cat /etc/nginx/.htpasswd
 ```
 
 Furthermore, if you want to remove the additionaluser (any user) from the Shiny Server, use the `-D` switch like so:
 ```{r, eval=F}
+# remove shiny-server user
 $ sudo htpasswd -D /etc/nginx/.htpasswd additionaluser
 ```
 
@@ -412,11 +462,13 @@ Additionally, to change the password of a user, one can merely just overite the 
 (NB: remember to leave out the `-c` switch)
 
 ```{r, eval= F}
+# change password of shiny-server user
 $ sudo htpasswd /etc/nginx/.htpasswd exampleuser
 ```
 
 Once all the required users are added, you can restart the nginx service and shiny-server.
 ```{r, eval= F}
+# start shiny-server and nginx service
 $ sudo start shiny-server
 $ sudo service nginx start
 ```
@@ -429,13 +481,14 @@ NB: Do not use ``http://<public-ip>:3838` (as done previously) just go directly 
 
 You can add an R Studio user with:
 ```{r, eval = F}
+# add RStudio user 
 $ sudo adduser exampleuser 
 ```
 
 This will prompt you to `Enter new UNIX password:`. This is where you define your R Studio Password. Furthermore, you will be asked to provide user information for user `exampleuser`. However, you can just press ENTER for the default. And press [Y] to confirm that the information correct.
 
 Once this is done, you can now access your RStudio GUI using your user information. Go to `http://<public-ip>:8787` and log in. You should be then be greeted by the friendly RStudio GUI. 
-```{r, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/rstudio2.png")
 ```
 
@@ -444,20 +497,24 @@ Adding a user can be done multiple times. However, each user will gain access to
 
 - Additionally, if you want to check current users on R Studio Server, you can use:
 ```{r, eval=F}
+# list RStudio users
 $ cut -d: -f1 /etc/passwd
 ```
 If you want to change the password of an R Studio user, you can do so with:
 ```{r, eval=F}
+# change password of RStudio user 
 $ sudo passwd exampleuser # where exampleuser is the username of the user of interest 
 ```
 This will prompt you to enter the new UNIX password for user "exampleuser". 
 
 Furthermore, if you want to remove a user, you can use:
 ```{r, eval=F}
+# remove RStudio user 
 $ sudo userdel exampleuser 
 ```
 However, if you get the note "userdel: user exampleuser is currently used by process 8334 (<pid>)", then you have first to kill the process using: 
 ```{r, eval=F}
+# kill RStudio user session
 $ sudo rstudio-server kill-session <pid>
 ```
 And then you will be able to remove the user exampleuser using `$ sudo userdel`
@@ -468,6 +525,7 @@ Please see the [RStudio Server Professional Edition Administration Guide](http:/
 
 Before you deploy your desired dashboard (from GitHub), you will want to remove the default `index.html` and `sample-apps` from the R Shiny server. Annoyingly, this must be down via the command line using the following code:
 ```{r, eval = F}
+# remove default files on shiny server
 $ sudo chmod 7777 /srv/shiny-server/  #set file permissions to read/write
 $ sudo rm /srv/shiny-server/index.html
 $ sudo rm -rf /srv/shiny-server/sample-apps
@@ -486,7 +544,7 @@ You can then clone a GitHub repository within the R Studio interface, using the 
 
 For example: https://github.com/reidfalconer/demo_aws_dash.git
 
-```{r, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/git.png")
 ```
 
@@ -502,7 +560,7 @@ For Example:
 list.files('/srv/shiny-server')
 file.copy(paste0(getwd(),"/AWS_demo.Rmd"),"/srv/shiny-server/")
 ```
-```{r, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/git2.png")
 ```
 
@@ -513,6 +571,24 @@ knitr::include_graphics("images/git2.png")
 Go to  `http://<public-ip>` 
 
 If everything worked then you should see: 
-```{r, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/success.png")
 ```
+
+# Maintainence 
+
+#### Upgrading your RStudio and Shiny Servers
+
+To upgrade to a new version you simply need to just install the new version. If you perform an upgrade and an existing version of the server is currently running, then the upgrade process will ensure that active sessions are immediately migrated to the new version. 
+
+```{r, eval = F}
+# update Rstudio and Shiny servers
+$ sudo gdebi <rstudio-server-version.deb>
+$ sudo gdebi <shiny-server-version.deb>
+```
+
+# Resources
+- Catherine Ordun's: [Deploying an R Shiny App to AWS](http://tm3.ghost.io/2017/12/31/deploying-an-r-shiny-app-to-aws/) 
+- Mitchell Gritt's: [Shiny Server on AWS](http://mgritts.github.io/2016/07/08/shiny-aws/)
+- Davis Vaughan's: [RStudio and Shiny Servers with AWS](https://blog.davisvaughan.com/post/rstudio-shiny-aws-1/)
+- Special thanks to Hendrik van Broekhuizen for all the tips and tricks. 

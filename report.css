@@ -4,7 +4,7 @@ Author: Hendrik van Broekhuizen
 
 /* COLOURS */
 :root {
-    --BLUE:    	#056EEE;
+    --BLUE:    	#0083a8;
     --BLACK:   	#333333;
     --WHITE:   	#FEFEFE;
     --GRAY:    	#828282;
@@ -94,7 +94,7 @@ a {
 
 .summary {
   padding-left: 20px;
-  border-left: solid 5px var(--PI_BLUE);
+  border-left: solid 5px var(--BLUE);
   box-sizing: border-box;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -105,8 +105,8 @@ a {
 /* Floating TOC */
 
 .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
-  background-color: var(--PI_BLUE);
-  border-color: var(--PI_BLUE);
+  background-color: var(--BLUE);
+  border-color: var(--BLUE);
 }
 
 .tocify-extend-page {
@@ -114,11 +114,10 @@ a {
 }
 
 
-
 /* Add space at top for logo */
-h1.title {
-	margin-top: var(--MARGINHEIGHT);
-}
+/*h1.title {
+/*	margin-top: var(--MARGINHEIGHT);
+/*}
 
 /* logo styling */
 #logo-container {
@@ -175,3 +174,4 @@ table.dataTable thead th, table.dataTable thead td {
 .compact.dataTable.no-footer {
 	display: none;
 }
+
