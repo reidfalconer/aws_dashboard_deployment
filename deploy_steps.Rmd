@@ -5,6 +5,7 @@ title: "How to deploy a Dashboard using RStudio and AWS"
 #date: "5/23/2018"
 output:
   html_document:
+    code_folding: show
     css: report.css
     highlight: textmate
     number_sections: no
@@ -26,6 +27,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.align = 'center', dev = 'svglite', fig.ex
 library(tidyverse)
 library(knitr)
 library(kableExtra)
+library(rmarkdown)
 ```
 <style>
 .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
@@ -235,7 +237,7 @@ This input should return `rstudio-server-X-amd64.deb  shiny-server-X-amd64.deb`:
 
 - See this handy [Bash CheatSheet for UNIX Systems](https://gist.github.com/LeCoupa/122b12050f5fb267e75f) for other bash commands.
 
-# Step 3: Install R Libraries: 
+# Step 3: Install R Libraries: {.tabset}
 
 You can now install all your required R packages onto the server. However, installing R packages is a little different on the server than on your local machine. For packages to be available for all users and roles, you must use `$ sudo su - -c "R ..."` when installing the packages.
 
@@ -243,38 +245,37 @@ The commands below install shiny related libraries, the tidyverse and htmlwidget
 
 _Warning: if you are using an instance with little memory some packages may exhaust the memory and thus won’t be able to compile. (One negative of the Free Tier EC2 instance)_
 
-### Shiny related libraries
+## Shiny libraries
 ```{r, eval=F}
 $ sudo su - -c "R -e \"install.packages(c('shiny', 'rmarkdown', 'shinydashboard', 'shinyjs', 'flexdashboard'), repos='http://cran.rstudio.com/')\""
 ```
 
-### Tidyverse
+## Tidyverse and More
 ```{r, eval=F}
-$ sudo su - -c "R -e \"install.packages('tidyverse', repos='http://cran.rstudio.com/')\""
+$ sudo su - -c "R -e \"install.packages(c('tidyverse', 'data.table', 'here', 'rpivotTable', 'RColorBrewer'), repos='http://cran.rstudio.com/')\""
 ```
 
-<!-- ### Spatial Analysis -->
-<!-- ```{r, eval=F} -->
-<!-- $ sudo su - -c "R -e \"install.packages(c('sp', 'rgdal', 'rgeos', 'adehabitatHR', 'geojsonio', 'maptools'), repos='http://cran.rstudio.com/')\"" -->
-<!-- ``` -->
-
-### htmlwidgets
+## Spatial Analysis
 ```{r, eval=F}
-$ sudo su - -c "R -e \"install.packages(c('leaflet', 'highcharter', 'DT'), repos='http://cran.rstudio.com/')\""
+$ sudo su - -c "R -e \"install.packages(c('sp', 'rgdal', 'rgeos', 'adehabitatHR', 'geojsonio', 'maptools'), repos='http://cran.rstudio.com/')\""
 ```
 
-### devtools
+## htmlwidgets
+```{r, eval=F}
+$ sudo su - -c "R -e \"install.packages(c('leaflet', 'highcharter', 'htmlTable', 'htmlwidgets', 'DT'), repos='http://cran.rstudio.com/')\""
+```
+
+## devtools
 If you want to install the development version of a package (ggplot2 in this example) from GitHub, you can use:
 ```{r, eval=F}
 sudo su - -c "R -e \"install.packages('devtools', repos='http://cran.rstudio.com/')\""
 sudo su - -c "R -e \"devtools::install_github('tidyverse/ggplot2')\""
 ```
 
-### Package Error
+## Package Error
 If you get an error installing one of your packages. The problem is most likely a memory issue (especially if you are using the 1 GiB free tier option). One way around this is to look online for an Ubuntu repository of the precompiled R package. 
 
 For example: I got an error trying to install the `readr` package (in the tidyverse). Therefore, I used the code below to access the Launchpad PPA. (Packages for the CRAN repository are built on a Launchpad PPA called RutteR). See [RutteR](https://launchpad.net/~marutter/+archive/ubuntu/rrutter) for more info.
-
 ```{r, eval=F}
 $ sudo add-apt-repository -y "ppa:marutter/rrutter"
 $ sudo add-apt-repository -y "ppa:marutter/c2d4u"
@@ -289,7 +290,9 @@ $ free -m
 ```
 Where `-m` shows output in megabytes and `-g` shows output in gigabytes.
 
-Furthermore, you can now easily confirm that both your RStudio and R Shiny servers are running correctly: 
+### Sanity Check
+
+You can now also easily confirm that both your RStudio and R Shiny servers are running correctly: 
 
 - The R Shiny Server is served on port `3838`. Thus, if you type your `http://<public-ip>:3838`  into the URL bar of a browser you should see a default index.html page with a shiny app and rmarkdown document.
 
