@@ -1,5 +1,5 @@
 ---
-title: "How to deploy a Dashboard using RStudio and AWS" 
+title: "How to deploy a Dashboard using RStudio and AWS in 10 Steps" 
 #subtitle: "A report prepared for Predictive Insights"
 #author: "Reid Falconer"
 #date: "5/23/2018"
@@ -45,7 +45,7 @@ You need to sign up if you haven’t registered yet with AWS, so head on over to
 
 Once on the home page you can select the top right to sign in to the console. This will allow you to sign in or set up an account if you do not have one.
 
-# Step 2: Launch EC2 instance following this AWS [10-Minute Tutorial](https://aws.amazon.com/getting-started/launch-a-virtual-machine-B-0/launch-a-virtual-machine-B-1/).
+# Step 2: Launch EC2 instance following this AWS [10-Minute Tutorial](https://aws.amazon.com/getting-started/launch-a-virtual-machine-B-0/launch-a-virtual-machine-B-1/)
 ```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/aws.png")
 ```
@@ -96,7 +96,7 @@ Upon clicking launch, you will be prompted with a pop-up to "Select an existing 
 
 Once downloaded and stored, you can "Launch" your instance by clicking `Launch Instances` After a few minutes of setup and initialisation your instance is ready to use, and you can view it by clicking `View Instances`. Be sure to make a note of the Public IP (`<public-ip>`); you’ll use this to connect to the instance.
 
-# Step 3: Connecting to your new instance. 
+# Step 3: Connecting to your new instance
 
 Once your instance is up and running, you can go ahead and connect to it by clicking on it and clicking "Connect".
 
@@ -151,7 +151,7 @@ If you ever want to disconnect from your instance (when you've finished this tut
 $ exit
 ```
 
-# Step 2: Installing System Libraries.
+# Step 4: Installing System Libraries
 
 You are now ready to install R and the required system libraries. But first, you need to update the Linux application library. 
 
@@ -237,7 +237,7 @@ This input should return `rstudio-server-X-amd64.deb  shiny-server-X-amd64.deb`:
 
 - See this handy [Bash CheatSheet for UNIX Systems](https://gist.github.com/LeCoupa/122b12050f5fb267e75f) for other bash commands.
 
-# Step 3: Install R Libraries: {.tabset}
+# Step 5: Install R Libraries {.tabset}
 
 You can now install all your required R packages onto the server. However, installing R packages is a little different on the server than on your local machine. For packages to be available for all users and roles, you must use `$ sudo su - -c "R ..."` when installing the packages.
 
@@ -290,6 +290,8 @@ $ free -m
 ```
 Where `-m` shows output in megabytes and `-g` shows output in gigabytes.
 
+#
+
 ### Sanity Check
 
 You can now also easily confirm that both your RStudio and R Shiny servers are running correctly: 
@@ -306,7 +308,7 @@ knitr::include_graphics("images/shiny2.png")
 knitr::include_graphics("images/rstudio.png")
 ```
 
-# Step 4: Password Protecting your Shiny Server
+# Step 6: Password Protecting your Shiny Server
 
 The open source version of Shiny Server doesn’t have password protection as a feature (Shiny Server Pro does). However, it is sometimes both essential and convenient to password protect your application/dashboard. Thus, you are now going to use nginx to password protect your shiny server. 
 
@@ -430,9 +432,9 @@ Use `Ctrl+x` to exit and type `Y` to save. Press `ENTER` to return to the comman
 
 `nano` does take some time getting used to but now you have set up the groundwork required to create users and passwords on your Shiny Server. The IP address `127.0.0.1` is a special-purpose IPv4 address called localhost or loopback address. All computers use this address as their own, but it doesn't let them communicate with other devices like a real IP address does. See [www.lifewire.com](https://www.lifewire.com/network-computer-special-ip-address-818385) for more information. 
 
-# Step 5: Create Users and Passwords
+# Step 7: Create Users and Passwords
 
-In Step 2 you installed the `apache2-utils` package which will allow you to create a password file using the Apache utilities. While OpenSSL can encrypt passwords for Nginx authentication, many users find it easier to use a purpose-built utility. The `htpasswd` utility serves this function well.
+In [Step 2](#step_2:_launch_ec2_instance_following_this_aws_10-minute_tutorial) you installed the `apache2-utils` package which will allow you to create a password file using the Apache utilities. While OpenSSL can encrypt passwords for Nginx authentication, many users find it easier to use a purpose-built utility. The `htpasswd` utility serves this function well.
 
 You can now create users and passwords with `htpasswd`. You’ll first create a user, then, be prompted to enter and confirm a password. You will then restart the nginx service and shiny-server once the required users are added.
 
@@ -484,7 +486,7 @@ You can now check whether R Shiny servers is in fact password protected. Just ty
 
 NB: Do not use ``http://<public-ip>:3838` (as done previously) just go directly to `http://<public-ip>`
 
-# Step 6: Create an R Studio Password and Gain Access to the R Studio Server
+# Step 8: Create an R Studio Password and Gain Access to the R Studio Server
 
 You can add an R Studio user with:
 ```{r, eval = F}
@@ -528,7 +530,7 @@ Then you will be able to remove the user exampleuser using `$ sudo userdel`
 
 Please see the [RStudio Server Professional Edition Administration Guide](http://docs.rstudio.com/ide/server-pro/index.html) and the [Shiny Server Professional Administrator's Guide](http://docs.rstudio.com/shiny-server/) for more detailed information and alternative commands.  
 
-# Step 7: Deploying your Shiny Flexdashboard/Shiny App to AWS
+# Step 9: Deploying your Shiny Flexdashboard/Shiny App to AWS
 
 Before you deploy your desired dashboard (from GitHub), you will want to remove the default `index.html` and `sample-apps` from the R Shiny server. Annoyingly, this must be down via the command line using the following code:
 ```{r, eval = F}
@@ -573,7 +575,7 @@ knitr::include_graphics("images/git2.png")
 
 - You can use `file.remove('/srv/shiny-server/flexdashboard.Rmd')` to remove the `flexdashboard.Rmd`. And add a new dashboard to the Shiny Server.
 
-# Step 8: Success
+# Step 10: Success
 
 Go to  `http://<public-ip>` 
 
@@ -598,4 +600,4 @@ $ sudo gdebi <shiny-server-version.deb>
 - Catherine Ordun's: [Deploying an R Shiny App to AWS](http://tm3.ghost.io/2017/12/31/deploying-an-r-shiny-app-to-aws/) 
 - Mitchell Gritt's: [Shiny Server on AWS](http://mgritts.github.io/2016/07/08/shiny-aws/)
 - Davis Vaughan's: [RStudio and Shiny Servers with AWS](https://blog.davisvaughan.com/post/rstudio-shiny-aws-1/)
-- Special thanks to Hendrik van Broekhuizen for all the tips and tricks. 
+- Hendrik van Broekhuizen: for all the tips and tricks. 
