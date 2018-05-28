@@ -42,11 +42,20 @@ You need to sign up if you haven't registered yet with AWS, so head on over to h
 Once on the home page you can select the top right to sign in to the console. This will allow you to sign in or set up an account if you do not have one.
 
 # Step 2: Launch EC2 Instance
+
+When you have logged in click `All services` -> `Compute` -> `EC2`:
+
+- Ensure that the Region is set to EU West (Ireland)
+
 ```{r, echo=FALSE, out.width = '80%'}
-knitr::include_graphics("images/aws.png")
+knitr::include_graphics("images/aws1.png")
 ```
 
-### Configuration Settings
+This will take you through to the `EC2` dashboard where you can select `Launch Instance`:
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/aws2.png")
+```
 
 The configuration setting I used are as follows:
 ```{r, echo=FALSE, warning= FALSE, message=FALSE}
@@ -101,7 +110,7 @@ You should get the following "connect to your instance" pop-up:
 knitr::include_graphics("images/connect.png")
 ```
 
-You should now minimize your browser window and fire up your command line - on a Mac, it's your Terminal (if you run on Windows, you'll need to download [PuTTY](https://www.putty.org/).). Then the first thing you want to do is to change your directory (cd) to where your key (`.pem` file) was securly moved to (i.e out of your download folder).
+You can now minimize your browser window and fire up your command line - on a Mac, it's your Terminal (if you run on Windows, you'll need to download [PuTTY](https://www.putty.org/).). Then the first thing you want to do is to change your directory (cd) to where your key (`.pem` file) was securly moved to (i.e out of your download folder).
 
 ```{r, eval= F}
 # set working directory 
@@ -238,7 +247,7 @@ This input should return `rstudio-server-X-amd64.deb  shiny-server-X-amd64.deb`:
 
 You can now install all your required R packages onto the server. However, installing R packages is a little different on the server than on your local machine. For packages to be available for all users and roles, you must use `$ sudo su - -c "R ..."` when installing the packages.
 
-The commands below install shiny related libraries, the tidyverse and htmlwidget libraries (you should add all the packages and their dependencies that your dashboard/application requires to render successfully). 
+The commands below install shiny related libraries, the tidyverse and htmlwidget libraries (you must add all the packages and their dependencies that your dashboard/application requires to render successfully). 
 
 _Warning: if you are using an instance with little memory some packages may exhaust the memory and thus won't be able to compile. (One negative of the Free Tier EC2 instance)_
 
