@@ -123,9 +123,17 @@ $ chmod 400 "file.pem"
 This makes you public key not publicly viewable (i.e. hides the file) (only needs to be run the first time you use your SSH key).
 
 Next, you'll connect to your instance by typing (copy and paste it exactly as shown under "Example" in "connect to your instance" pop-up):
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/connect_edit.png")
+```
+
 ```{r, eval= F}
 $ ssh -i "file.pem" ubuntu@ec2-IPADDRESS.compute-1.amazonaws.com
 ```
+
+
+
 When you connect for the first time, it might give you a prompt asking: "Are you sure you want to continue connecting?" Type `yes`. Hopefully, you'll see something like this:
 
 ```{r, eval=FALSE}
