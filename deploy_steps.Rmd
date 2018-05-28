@@ -6,7 +6,7 @@ title: "How to deploy a Dashboard using RStudio and AWS in 10 Steps"
 output:
   html_document:
     code_folding: show
-    css: report.css
+    #css: report.css
     highlight: textmate
     number_sections: no
     theme: united
@@ -549,7 +549,7 @@ git config --global user.email 'your@email.com'
 git config --global credential.helper 'cache --timeout=10000000'
 ```
 
-You can then clone a GitHub repository within the R Studio interface, using the "Clone with HTTPS" URL (see Jenny Bryan's [happygitwithr.com](happygitwithr.com/)) available on GitHub. 
+You can then clone a GitHub repository within the R Studio interface, using the "Clone with HTTPS" URL available on GitHub (see Jenny Bryan's [happygitwithr.com](happygitwithr.com/) for GitHub tutorial). 
 
 For example: https://github.com/reidfalconer/demo_aws_dash.git
 
@@ -600,4 +600,4 @@ $ sudo gdebi <shiny-server-version.deb>
 - Catherine Ordun's: [Deploying an R Shiny App to AWS](http://tm3.ghost.io/2017/12/31/deploying-an-r-shiny-app-to-aws/) 
 - Mitchell Gritt's: [Shiny Server on AWS](http://mgritts.github.io/2016/07/08/shiny-aws/)
 - Davis Vaughan's: [RStudio and Shiny Servers with AWS](https://blog.davisvaughan.com/post/rstudio-shiny-aws-1/)
-- Hendrik van Broekhuizen: for all the tips and tricks. 
+- Hendrik van Broekhuizen: Tips and tricks. 
