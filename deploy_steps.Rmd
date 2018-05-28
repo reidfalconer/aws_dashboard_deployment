@@ -1,8 +1,8 @@
 ---
 title: "How to deploy an R Shiny Dashboard using AWS in 10 Steps" 
-#subtitle: "A report prepared for Predictive Insights"
-#author: "Reid Falconer"
-#date: "5/23/2018"
+#subtitle:
+author: "Reid Falconer"
+#date: "5/28/2018"
 output:
   html_document:
     code_folding: show
