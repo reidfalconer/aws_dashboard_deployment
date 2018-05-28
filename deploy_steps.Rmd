@@ -1,5 +1,5 @@
 ---
-title: "How to deploy a Dashboard using RStudio and AWS in 10 Steps" 
+title: "How to deploy an R Shiny Dashboard using AWS in 10 Steps" 
 #subtitle: "A report prepared for Predictive Insights"
 #author: "Reid Falconer"
 #date: "5/23/2018"
@@ -37,15 +37,11 @@ library(rmarkdown)
 
 # Step 1: Setup an AWS Account
 
-[Amazon](aws.amazon.com/) provides one year’s worth of access to their Free Tier for AWS. However, there are a vast number of options available, and they are worth checking out. 
-
-If you aren’t familiar with EC2 (Amazon’s Elastic Compute Cloud), think of it as your always-on personal Linux computer that you can connect to through SSH, and access through the web using an IP address for running applications on AWS infrastructure.
-
-You need to sign up if you haven’t registered yet with AWS, so head on over to https://aws.amazon.com to get started.
+You need to sign up if you haven't registered yet with AWS, so head on over to https://aws.amazon.com to get started.
 
 Once on the home page you can select the top right to sign in to the console. This will allow you to sign in or set up an account if you do not have one.
 
-# Step 2: Launch EC2 instance following this AWS [10-Minute Tutorial](https://aws.amazon.com/getting-started/launch-a-virtual-machine-B-0/launch-a-virtual-machine-B-1/)
+# Step 2: Launch EC2 Instance
 ```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/aws.png")
 ```
@@ -55,10 +51,10 @@ knitr::include_graphics("images/aws.png")
 The configuration setting I used are as follows:
 ```{r, echo=FALSE, warning= FALSE, message=FALSE}
 text_tbl <- data.frame(
-  Option = c("AMI", "Instance Type","Configure Instance","Storage", "Tag", "Security Group"),
+  Option = c("1. Choose AMI", "2. Choose Instance Type","3. Configure Instance","4. Add Storage", "5. Add Tags", "6. Configure Security Group"),
   Choice = c(
     "Ubuntu Server 14.04 LTS (HVM), SSD Volume Type - This option is chosen since it is free tier eligible and it behaves well when setting up an RStudio and Shiny server.",
-    "t2.micro - The free tier option. However, given that R works in memory, this choice is very restrictive (only 1 GiB memory). Thus, I recommend choosing an instance with more memory (i.e. the ones that are memory optimised) if you are going to be doing large amounts of computing.", 
+    "t2.micro - The free tier option. However, given that R works in memory, this choice is very restrictive (only 1 GiB memory), I recommend choosing an instance with more memory (i.e. the ones that are memory optimised) if you are going to be doing large amounts of computing via your dashboard/application.", 
     "All Default - Skip this page if you want.", 
     "16gb - The default is 8gb but you can get up to 30 GB of EBS General Purpose (SSD) or Magnetic storage on the free tier.",
     "ShinyDashboard - Tags can be helpful for organizing your AWS services.",
@@ -94,34 +90,34 @@ In the final step, you can "Review Instance Launch". This tread will allow you t
 
 Upon clicking launch, you will be prompted with a pop-up to "Select an existing key pair or create a new key pair" I recommend always creating a new key pair and naming it appropriately (i.e. `aws_dashboard`). Be sure to save this (`.pem` file) in a secure and easily accessible location as you will not be able to download the file again.
 
-Once downloaded and stored, you can "Launch" your instance by clicking `Launch Instances` After a few minutes of setup and initialisation your instance is ready to use, and you can view it by clicking `View Instances`. Be sure to make a note of the Public IP (`<public-ip>`); you’ll use this to connect to the instance.
+Once downloaded and stored, you can "Launch" your instance by clicking `Launch Instances` After a few minutes of setup and initialisation your instance is ready to use, and you can view it by clicking `View Instances`. Be sure to make a note of the Public IP (`<public-ip>`); you'll use this to connect to the instance.
 
 # Step 3: Connecting to your new instance
 
 Once your instance is up and running, you can go ahead and connect to it by clicking on it and clicking "Connect".
 
-You should get the following pop-up:
+You should get the following "connect to your instance" pop-up:
 ```{r, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/connect.png")
 ```
 
-Now it's time to fire up your command line - on a Mac, it's your Terminal (if you run on Windows, you’ll need to download [PuTTY](https://www.putty.org/).) - and change your directory (cd) to where your key (`.pem` file) was securly moved to (i.e out of your download folder).
+You should now minimize your browser window and fire up your command line - on a Mac, it's your Terminal (if you run on Windows, you'll need to download [PuTTY](https://www.putty.org/).). Then the first thing you want to do is to change your directory (cd) to where your key (`.pem` file) was securly moved to (i.e out of your download folder).
 
 ```{r, eval= F}
 # set working directory 
 $ cd path_to_file/file.pem
 ```
-Back in Terminal, you'll want to enter:
+You'll then want to enter:
 ```{r, eval= F}
 $ chmod 400 "file.pem"
 ```
 This makes you public key not publicly viewable (i.e. hides the file) (only needs to be run the first time you use your SSH key).
 
-Next, you’ll connect to your instance by typing (copy and paste it exactly as shown under "Example" in the pop-up):
+Next, you'll connect to your instance by typing (copy and paste it exactly as shown under "Example" in "connect to your instance" pop-up):
 ```{r, eval= F}
 $ ssh -i "file.pem" ubuntu@ec2-IPADDRESS.compute-1.amazonaws.com
 ```
-When you connect for the first time, it might give you a prompt asking: "Are you sure you want to continue connecting?” Type `yes`. Hopefully, you’ll see something like this:
+When you connect for the first time, it might give you a prompt asking: "Are you sure you want to continue connecting?" Type `yes`. Hopefully, you'll see something like this:
 
 ```{r, eval=FALSE}
 Welcome to Ubuntu 14.04.5 LTS (GNU/Linux 3.13.0-149-generic x86_64)
@@ -145,7 +141,7 @@ Welcome to Ubuntu 14.04.5 LTS (GNU/Linux 3.13.0-149-generic x86_64)
 
 ### Disconnecting from your instance
 
-If you ever want to disconnect from your instance (when you've finished this tutorial), simply type `exit` into your terminal and you’ll be logged out and disconnected from your AWS instance.
+If you ever want to disconnect from your instance (only when you've finished this tutorial), simply type `exit` into your terminal and you'll be logged out and disconnected from your AWS instance.
 ```{r, eval= F}
 # disconnect from instance
 $ exit
@@ -175,13 +171,14 @@ $ sudo apt-get -y install \
     libv8-dev \
     git
 ```
+
 To confirm that things are working as they should be. Type your `http://<public-ip>`  into the URL bar of a browser you should get the following nginx welcome screen: 
 ```{r pressure, echo=FALSE, out.width = '80%'}
 knitr::include_graphics("images/nginx.png")
 ```
 Nginx will be used to improve the performance, reliability, and security of your the shiny dashboard/application.
 
-Move back in the terminal. The following commands set the sources to the RStudio mirror, then grabs keys to authenticate the installation.
+Moving back to the terminal. The following commands set the sources to the RStudio mirror, and then grabs keys to authenticate the installation.
 
 ```{r, eval=F}
 $ sudo sh -c 'echo "deb http://cran.rstudio.com/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list'
@@ -198,11 +195,11 @@ $ sudo apt-get install r-base
 ```
 You may get a prompt saying "X MB of additional disk space will be used. Do you want to continue? [Y/n]" Type `Y`. 
 
-We can then run R (within the Terminal) after the install and check the `sessionInfo()` using the following code:
+We can then run R within the Terminal and check the `sessionInfo()` using the following code:
 ```{r, eval=F}
 $ R
-> sessionInfo()
-> quit()
+> sessionInfo() # confirm latest version of R is running
+> quit() # to quit the R session
 ```
 
 You are now ready to install both the RStudio and R Shiny Servers using the syntax below. However, please check the [RStudio Server](https://www.rstudio.com/products/rstudio/download-server/) and [Shiny Server](https://www.rstudio.com/products/shiny/download-server/) links to make sure that the commands are for the most recent versions of the respective servers.
@@ -243,7 +240,7 @@ You can now install all your required R packages onto the server. However, insta
 
 The commands below install shiny related libraries, the tidyverse and htmlwidget libraries (you should add all the packages and their dependencies that your dashboard/application requires to render successfully). 
 
-_Warning: if you are using an instance with little memory some packages may exhaust the memory and thus won’t be able to compile. (One negative of the Free Tier EC2 instance)_
+_Warning: if you are using an instance with little memory some packages may exhaust the memory and thus won't be able to compile. (One negative of the Free Tier EC2 instance)_
 
 ## Shiny libraries
 ```{r, eval=F}
@@ -294,7 +291,7 @@ Where `-m` shows output in megabytes and `-g` shows output in gigabytes.
 
 ### Sanity Check
 
-You can now also easily confirm that both your RStudio and R Shiny servers are running correctly: 
+You can now also easily confirm that both your RStudio and R Shiny servers are up and running correctly: 
 
 - The R Shiny Server is served on port `3838`. Thus, if you type your `http://<public-ip>:3838`  into the URL bar of a browser you should see a default index.html page with a shiny app and rmarkdown document.
 
@@ -310,7 +307,7 @@ knitr::include_graphics("images/rstudio.png")
 
 # Step 6: Password Protecting your Shiny Server
 
-The open source version of Shiny Server doesn’t have password protection as a feature (Shiny Server Pro does). However, it is sometimes both essential and convenient to password protect your application/dashboard. Thus, you are now going to use nginx to password protect your shiny server. 
+The open source version of Shiny Server doesn't have password protection as a feature (Shiny Server Pro does). However, it is sometimes both essential and convenient to password protect your application/dashboard. Thus, you are now going to use nginx to password protect your shiny server. 
 
 First, you must stop both the nginx service and shiny-server. This process should always be done before changing any server configuration settings.
 
@@ -369,7 +366,7 @@ server {
 ^X Exit             ^J Justify          ^W Where Is         ^V Next Page        ^U UnCut Text       ^T To Spell
 ```
 
-Now delete __EVERY SINGLE LINE__ (Using `Ctrl+k`) and replace it with:
+Now delete __EVERY SINGLE LINE__ (Using `Ctrl+k`) and replace it with (copy and paste):
 ```{r, eval=F}
 server {
     listen 80;
@@ -401,7 +398,7 @@ You  must now do a similar process to the shiny-server config file at `/etc/shin
 $ sudo nano /etc/shiny-server/shiny-server.conf
 ```
 
-Where it currently reads listen 3838, add `127.0.0.1`: 
+Where it currently reads `listen 3838`, add `127.0.0.1`: 
 ```{r, eval=F}
 # Instruct Shiny Server to run applications as the user "shiny"
 run_as shiny;
@@ -430,13 +427,13 @@ knitr::include_graphics("images/nano3.png")
 ```
 Use `Ctrl+x` to exit and type `Y` to save. Press `ENTER` to return to the command line.
 
-`nano` does take some time getting used to but now you have set up the groundwork required to create users and passwords on your Shiny Server. The IP address `127.0.0.1` is a special-purpose IPv4 address called localhost or loopback address. All computers use this address as their own, but it doesn't let them communicate with other devices like a real IP address does. See [www.lifewire.com](https://www.lifewire.com/network-computer-special-ip-address-818385) for more information. 
+`nano` does take some time getting used to but you have now set up the required configuration settings to create users and passwords on your Shiny Server. The IP address `127.0.0.1` is a special-purpose IPv4 address called localhost or loopback address. All computers use this address as their own, but it doesn't let them communicate with other devices like a real IP address does. See [www.lifewire.com](https://www.lifewire.com/network-computer-special-ip-address-818385) for more information. 
 
-# Step 7: Create Users and Passwords
+# Step 7: Create Shiny Users and Passwords
 
-In [Step 2](#step_2:_launch_ec2_instance_following_this_aws_10-minute_tutorial) you installed the `apache2-utils` package which will allow you to create a password file using the Apache utilities. While OpenSSL can encrypt passwords for Nginx authentication, many users find it easier to use a purpose-built utility. The `htpasswd` utility serves this function well.
+In [Step 2](#step_2:_launch_ec2_instance) you installed the `apache2-utils` package which will allow you to create a password file using the Apache utilities. While OpenSSL can encrypt passwords for Nginx authentication, many users find it easier to use a purpose-built utility. The `htpasswd` utility serves this function well.
 
-You can now create users and passwords with `htpasswd`. You’ll first create a user, then, be prompted to enter and confirm a password. You will then restart the nginx service and shiny-server once the required users are added.
+You can now create users and passwords with `htpasswd`. You'll first create a user, then, be prompted to enter and confirm a password. You will then restart the nginx service and shiny-server once the required users are added.
 
 - Note: the first time we use this utility, you need to add the `-c` option (switch) to create the specified password file (`.htpasswd` in this example).  You can then specify a username (exampleuser in this example) at the end of the command to create a new entry into that file:
 
@@ -486,7 +483,7 @@ You can now check whether R Shiny servers is in fact password protected. Just ty
 
 NB: Do not use ``http://<public-ip>:3838` (as done previously) just go directly to `http://<public-ip>`
 
-# Step 8: Create an R Studio Password and Gain Access to the R Studio Server
+# Step 8: Create RStudio Users and Gain Access to the RStudio GUI
 
 You can add an R Studio user with:
 ```{r, eval = F}
@@ -530,9 +527,9 @@ Then you will be able to remove the user exampleuser using `$ sudo userdel`
 
 Please see the [RStudio Server Professional Edition Administration Guide](http://docs.rstudio.com/ide/server-pro/index.html) and the [Shiny Server Professional Administrator's Guide](http://docs.rstudio.com/shiny-server/) for more detailed information and alternative commands.  
 
-# Step 9: Deploying your Shiny Flexdashboard/Shiny App to AWS
+# Step 9: Deploying your Shiny Dashboard/App to AWS
 
-Before you deploy your desired dashboard (from GitHub), you will want to remove the default `index.html` and `sample-apps` from the R Shiny server. Annoyingly, this must be down via the command line using the following code:
+Before you deploy your desired dashboard (from GitHub), you will want to remove the default `index.html` and `sample-apps` from the R Shiny server. Annoyingly, this must be done via the command line using the following code:
 ```{r, eval = F}
 # remove default files on shiny server
 $ sudo chmod 7777 /srv/shiny-server/  #set file permissions to read/write
@@ -540,9 +537,9 @@ $ sudo rm /srv/shiny-server/index.html
 $ sudo rm -rf /srv/shiny-server/sample-apps
 ```
 
-Once this is done, all further work can be executed in the R Studio GUI `http://<public-ip>:8787`.
+Once this is done, all further work can be executed within the R Studio GUI `http://<public-ip>:8787`.
 
-The first thing you should do is to configure your git `user.name` and `user.email` within the R Studio terminal. By entering the following:
+The first thing you should do is to configure your git `user.name` and `user.email` in the R Studio terminal. By entering the following:
 ```{r, eval = F}
 git config --global user.name 'Your Name'
 git config --global user.email 'your@email.com'
